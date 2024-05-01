@@ -3,7 +3,7 @@
 create table surgery (
 			 surgery_id int primary key,
 			 surgery varchar,
-			 surgery_price money
+			 surgery_price int
 )
 
 COPY surgery(surgery, surgery_price, surgery_id)
@@ -36,7 +36,7 @@ CSV HEADER
 create table doctor (
 			doctor_id int primary key,
 			doctor varchar,
-			doctor_price money
+			doctor_price int
 )
 
 COPY doctor(doctor, doctor_price, doctor_id)
@@ -52,7 +52,7 @@ create table drugs(
 			drug_id int primary key,
 			drug_brand varchar,
 			drug_type varchar,
-			drug_price money
+			drug_price int
 )
 
 COPY drugs(drug_brand, drug_type, drug_price, drug_id)
@@ -67,7 +67,7 @@ CSV HEADER
 create table lab (
 			lab_id int primary key,
 			lab varchar,
-			lab_price money
+			lab_price int
 )
 
 COPY lab(lab, lab_price, lab_id)
@@ -82,8 +82,8 @@ CSV HEADER
 create table room (
 			room_id int primary key,
 			room varchar,
-			food_price money,
-			room_price money
+			food_price int,
+			room_price int
 )
 
 COPY room(room, food_price, room_price, room_id)
@@ -102,8 +102,8 @@ create table hospital (
 	branch varchar,
 	hospital_care varchar,
 	drug_quantity int,
-	admin money,
-	cogs money,
+	admin int,
+	cogs int,
 	payment varchar,
 	review varchar,
 	patient_id int,
