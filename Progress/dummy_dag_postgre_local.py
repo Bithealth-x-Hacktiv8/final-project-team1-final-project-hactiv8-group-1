@@ -695,6 +695,16 @@ def total_revenue(**kwargs):
     revenue_list = revenue_list.tolist()
     return revenue_list
 
+def is_DBD(**kwargs):
+    df_hospital = merge_hospital()
+    is_DBD_list = [False] * len(df_hospital)
+    for i in range(0,len(df_hospital)):
+        if df_hospital['doctor'][i] == 'Umum' or df_hospital['doctor'][i] == 'Penyakit Dalam':
+            if pd.isna(df_hospital['surgery'][i]):
+                if df_hospital['lab'][i]=='Hematologi'or df_hospital['lab'][i]=='Serologi' or df_hospital['lab'][i]=='Kimia Darah':
+                    if df_hospital['drug_type'][i]=='Umum' or df_hospital['drug_type'][i]=='Pereda Nyeri' or df_hospital['drug_type'][i]=='Vitamin':
+                        is_DBD_list[i]=True
+    return is_DBD_list
 
 
 def time_created(**kwargs):
@@ -722,12 +732,10 @@ def execute(**kwargs):
     df_hospital['total_amount'] = total_price_all()
     df_hospital['revenue'] = total_revenue()
     df_hospital['created_at'] = time_created()
+    df_hospital['is_DBD'] = is_DBD()
 
     return df_hospital
 
-#save_local_csv(df_hospital)
-
-#print(df_hospital)
 
 '''
 hospital
@@ -741,52 +749,10 @@ surgery
 
 
 
-with DAG('finalproject', 
+with DAG('finalproject_local', 
          schedule_interval = '0 6 * * *',
          default_args = default_args, 
          catchup = False,) as dag:
-    
-    # table_hospital = PythonOperator(
-    #    task_id = 'creating_table_hospital',
-    #    python_callable = create_table_hospital,
-    #    provide_context = True,
-    # )
-
-    # table_doctor = PythonOperator(
-    #    task_id = 'creating_table_doctor',
-    #    python_callable = create_table_doctor,
-    #    provide_context = True,
-    # )
-
-    # table_drugs = PythonOperator(
-    #    task_id = 'creating_table_drugs',
-    #    python_callable = create_table_drugs,
-    #    provide_context = True,
-    # )
-
-    # table_lab = PythonOperator(
-    #    task_id = 'creating_table_lab',
-    #    python_callable = create_table_lab,
-    #    provide_context = True,
-    # )
-
-    # table_patient = PythonOperator(
-    #    task_id = 'creating_table_patient',
-    #    python_callable = create_table_patient,
-    #    provide_context = True,
-    # )
-
-    # table_room = PythonOperator(
-    #    task_id = 'creating_table_room',
-    #    python_callable = create_table_room,
-    #    provide_context = True,
-    # )
-
-    # table_surgery = PythonOperator(
-    #    task_id = 'creating_table_surgery',
-    #    python_callable = create_table_surgery,
-    #    provide_context = True,
-    # )
     
     read_table_hospital = PythonOperator(
         task_id = 'read_hospital_table',
@@ -892,6 +858,12 @@ with DAG('finalproject',
         provide_context = True,
     )
 
+    add_is_DBD = PythonOperator(
+        task_id = 'add_is_DBD',
+        python_callable = is_DBD,
+        provide_context = True,
+    )
+
     create_time_created = PythonOperator(
         task_id = 'create_time_created',
         python_callable = time_created,
@@ -931,4 +903,4 @@ read_table_surgery] >> merge_df  >> calculate_drugs_price >> calculate_days_diff
                                                                                                            calculate_room_price,
                                                                                                            calculate_surgery_price,
                                                                                                            calculate_lab_price,
-                                                                                                           calculate_infus_price] >> calculate_total_price >> calculate_revenue >> create_time_created >> execution >> saving_df
+                                                                                                           calculate_infus_price] >> calculate_total_price >> calculate_revenue >> add_is_DBD >> create_time_created >> execution >> saving_df
