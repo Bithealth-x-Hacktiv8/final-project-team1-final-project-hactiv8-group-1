@@ -107,11 +107,17 @@ create table hospital (
 	payment varchar,
 	review varchar,
 	patient_id int,
+	foreign key (patient_id) references patient(patient_id) on delete cascade,
 	room_id int,
+	foreign key (room_id) references room(room_id) on delete cascade,
 	drug_id int,
+	foreign key (drug_id) references drugs(drug_id) on delete cascade,
 	doctor_id int,
+	foreign key (doctor_id) references doctor(doctor_id) on delete cascade,
 	surgery_id int,
-	lab_id int
+	foreign key (surgery_id) references surgery(surgery_id) on delete cascade,
+	lab_id int,
+	foreign key (lab_id) references lab(lab_id) on delete cascade
 )
 
 COPY hospital(id, date_ind, date_out, branch, hospital_care, drug_quantity, admin, cogs, payment, review, patient_id, room_id, drug_id, doctor_id, surgery_id, lab_id)
